@@ -1,0 +1,100 @@
+contains(X,Z) :- contains(X,Y), contains(Y,Z).
+containedby(X,Z) :- containedby(X,Y), containedby(Y,Z).
+contains(X,Z) :- contains(X,Y), containedby(Z,Y).
+containedby(X,Z) :- containedby(X,Y), contains(Z,Y).
+currency(X,Z) :- second_level_division_of(X,Y), currency_used(Y,Z).
+category(X,Z) :- containedby(X,Y), category(Y,Z).
+administrative_children(X,Z) :- administrative_children(X,Y), administrative_children(Y,Z).
+administrative_parent(X,Z) :- administrative_parent(X,Y), administrative_parent(Y,Z).
+parent(X,Z) :- parent(X,Y), parent(Y,Z).
+child(X,Z) :- child(X,Y), child(Y,Z).
+contains(X,Z) :- administrative_children(X,Y), contains(Y,Z).
+containedby(X,Z) :- administrative_parent(X,Y), containedby(Y,Z).
+location(X,Z) :- location(X,Y), location(Y,Z).
+category(X,12683) :- topic(12683,X).
+spouse(7586,Y) :- type_of_union(Y,7586).
+type_of_union(X,7586) :- spouse(7586,X).
+profession(X,Y) :- people_with_this_profession(Y,X).
+category(X,12682) :- topic(12682,X).
+people_with_this_profession(12200,Y) :- profession(Y,12200).
+profession(X,12200) :- people_with_this_profession(12200,X).
+genre(X,Y) :- films_in_this_genre(Y,X).
+people_with_this_profession(X,Y) :- profession(Y,X).
+category(X,12683) :- containedby(X,A), category(A,12683).
+category(X,12683) :- containedby(X,A), topic(12683,A).
+place_of_birth(X,Y) :- people_born_here(Y,X).
+artist(X,Y) :- label(Y,X).
+people_born_here(X,Y) :- place_of_birth(Y,X).
+genre(X,1509) :- films_in_this_genre(1509,X).
+spouse(X,Y) :- type_of_union(Y,X).
+adjoins(X,Y) :- adjoins(Y,X).
+people_with_this_profession(12195,Y) :- profession(Y,12195).
+profession(X,12195) :- people_with_this_profession(12195,X).
+people_with_this_profession(12205,Y) :- profession(Y,12205).
+profession(X,12205) :- people_with_this_profession(12205,X).
+influenced(X,Y) :- influenced_by(Y,X).
+containedby(X,51) :- contains(51,X).
+contains(51,Y) :- containedby(Y,51).
+titles(X,Y) :- netflix_genres(Y,X).
+film_crew_role(X,12442) :- film(12442,X).
+film_crew_role(X,12380) :- film(12380,X).
+film_crew_role(X,12458) :- film(12458,X).
+film(X,Y) :- produced_by(Y,X).
+instruments_played(X,Y) :- instrumentalists(Y,X).
+instrumentalists(X,Y) :- instruments_played(Y,X).
+film_crew_role(X,12457) :- film(12457,X).
+film_crew_role(X,12420) :- film(12420,X).
+influenced_by(X,Y) :- influenced(Y,X).
+film(X,Y) :- written_by(Y,X).
+people_with_this_profession(12210,Y) :- profession(Y,12210).
+profession(X,12210) :- people_with_this_profession(12210,X).
+time_zones(X,Y) :- locations_in_this_time_zone(Y,X).
+locations_in_this_time_zone(X,Y) :- time_zones(Y,X).
+people_with_this_profession(12202,Y) :- profession(Y,12202).
+profession(X,12202) :- people_with_this_profession(12202,X).
+films(X,Y) :- production_companies(Y,X).
+position(X,4336) :- team(4336,X).
+position(X,4332) :- team(4332,X).
+position(X,4349) :- team(4349,X).
+people_with_this_profession(12211,Y) :- profession(Y,12211).
+profession(X,12211) :- people_with_this_profession(12211,X).
+people_with_this_profession(12218,Y) :- profession(Y,12218).
+profession(X,12218) :- people_with_this_profession(12218,X).
+film(X,Y) :- music(Y,X).
+genre(X,12518) :- films_in_this_genre(12518,X).
+film(X,Y) :- directed_by(Y,X).
+position(X,4334) :- team(4334,X).
+featured_in_films(X,Y) :- featured_film_locations(Y,X).
+featured_film_locations(X,Y) :- featured_in_films(Y,X).
+netflix_genres(X,Y) :- titles(Y,X).
+locations_in_this_time_zone(13137,Y) :- time_zones(Y,13137).
+time_zones(X,13137) :- locations_in_this_time_zone(13137,X).
+genre(X,1530) :- films_in_this_genre(1530,X).
+parent_genre(X,Y) :- subgenre(Y,X).
+people_with_this_profession(12203,Y) :- profession(Y,12203).
+profession(X,12203) :- people_with_this_profession(12203,X).
+genre(X,12525) :- films_in_this_genre(12525,X).
+school_type(X,Y) :- schools_of_this_kind(Y,X).
+genre(X,1645) :- films_in_this_genre(1645,X).
+films_executive_produced(X,Y) :- executive_produced_by(Y,X).
+people(X,Y) :- cause_of_death(Y,X).
+subject(14431,Y) :- taxonomy(Y,14431).
+taxonomy(X,14431) :- subject(14431,X).
+genre(X,Y) :- programs(Y,X).
+film_crew_role(X,12459) :- film(12459,X).
+netflix_genres(X,1509) :- titles(1509,X).
+titles(1509,Y) :- netflix_genres(Y,1509).
+people_with_this_profession(12196,Y) :- profession(Y,12196).
+profession(X,12196) :- people_with_this_profession(12196,X).
+award(X,6426) :- award_nominee(6426,X).
+subject(X,Y) :- taxonomy(Y,X).
+genre(X,8585) :- artists(8585,X).
+role(X,13511) :- organization(13511,X).
+instrumentalists(7249,Y) :- instruments_played(Y,7249).
+instruments_played(X,7249) :- instrumentalists(7249,X).
+currency(X,12986) :- second_level_division_of(X,51).
+currency(X,12986) :- second_level_division_of(X,A), currency_used(A,12986).
+second_level_division_of(X,51) :- second_level_divisions(51,X).
+second_level_divisions(51,Y) :- second_level_division_of(Y,51).
+source(X,12823) :- second_level_divisions(51,X).
+source(X,12823) :- second_level_divisions(A,X), jurisdiction(12823,A).

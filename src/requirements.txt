@@ -1,0 +1,4 @@
+# Online SQL execution and CART retraining
+datafusion==50.1.0
+pyarrow==15.0.0
+numpy>=1.23,<2

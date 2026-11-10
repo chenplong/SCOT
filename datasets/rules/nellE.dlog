@@ -1,0 +1,100 @@
+professionistypeofprofession(X,Z) :- professionistypeofprofession(X,Y), professionistypeofprofession(Y,Z).
+professionistypeofprofession_i(X,Z) :- professionistypeofprofession_i(X,Y), professionistypeofprofession_i(Y,Z).
+subpartoforganization(X,Z) :- subpartoforganization(X,Y), subpartoforganization(Y,Z).
+subpartoforganization_inv(X,Z) :- subpartoforganization_inv(X,Y), subpartoforganization_inv(Y,Z).
+personalsoknownas(X,Z) :- personalsoknownas(X,Y), personalsoknownas(Y,Z).
+athleteplayssport(X,Z) :- athleteplaysforteam(X,Y), teamplayssport(Y,Z).
+athleteplaysinleague(X,Z) :- athleteplaysforteam(X,Y), teamplaysinleague(Y,Z).
+athletehomestadium(X,Z) :- athleteplaysforteam(X,Y), teamhomestadium(Y,Z).
+latitudelongitude(X,Y) :- latitudelongitude_inv(Y,X).
+latitudelongitude_inv(X,Y) :- latitudelongitude(Y,X).
+atdate_inv(X,Y) :- atdate(Y,X).
+agentcreated_inv(X,Y) :- agentcreated(Y,X).
+proxyfor(X,Y) :- proxyfor_inv(Y,X).
+proxyfor_inv(X,Y) :- proxyfor(Y,X).
+agentcreated(X,Y) :- agentcreated_inv(Y,X).
+atdate(X,Y) :- atdate_inv(Y,X).
+proxyfor(X,135) :- proxyfor_inv(135,X).
+proxyfor_inv(135,Y) :- proxyfor(Y,135).
+mutualproxyfor(X,Y) :- mutualproxyfor_inv(Y,X).
+subpartof_inv(X,Y) :- subpartof(Y,X).
+atdate(X,277) :- atdate_inv(277,X).
+atdate_inv(277,Y) :- atdate(Y,277).
+atlocation_inv(X,Y) :- atlocation(Y,X).
+athleteplayssport(X,47) :- athleteplayssport_inv(47,X).
+mutualproxyfor_inv(X,Y) :- mutualproxyfor(Y,X).
+bookwriter_inv(X,Y) :- bookwriter(Y,X).
+atlocation(X,Y) :- atlocation_inv(Y,X).
+atdate(X,401) :- atdate_inv(401,X).
+atdate_inv(401,Y) :- atdate(Y,401).
+bookwriter(X,Y) :- bookwriter_inv(Y,X).
+atdate(X,658) :- atdate_inv(658,X).
+atdate_inv(658,Y) :- atdate(Y,658).
+teamplaysagainstteam_inv(X,Y) :- teamplaysagainstteam(Y,X).
+subpartof(X,Y) :- subpartof_inv(Y,X).
+atdate(X,638) :- atdate_inv(638,X).
+atdate_inv(638,Y) :- atdate(Y,638).
+agentcollaborateswithagent(X,Y) :- agentcollaborateswithagent_inv(Y,X).
+worksfor_inv(X,Y) :- worksfor(Y,X).
+organizationhiredperson_inv(X,Y) :- organizationhiredperson(Y,X).
+locationlocatedwithinlocation(X,Y) :- locationlocatedwithinlocation_(Y,X).
+worksfor(X,Y) :- worksfor_inv(Y,X).
+atdate(X,182) :- atdate_inv(182,X).
+atdate_inv(182,Y) :- atdate(Y,182).
+subpartoforganization_inv(X,Y) :- subpartoforganization(Y,X).
+weaponssuchasweapons(X,838) :- weaponssuchasweapons_inv(838,X).
+weaponssuchasweapons_inv(838,Y) :- weaponssuchasweapons(Y,838).
+locationlocatedwithinlocation_(X,Y) :- locationlocatedwithinlocation(Y,X).
+journalistwritesforpublication(X,Y) :- journalistwritesforpublication(Y,X).
+teamplaysagainstteam(X,Y) :- teamplaysagainstteam_inv(Y,X).
+atdate(X,254) :- atdate_inv(254,X).
+atdate_inv(254,Y) :- atdate(Y,254).
+locationlocatedwithinlocation(192,Y) :- locationlocatedwithinlocation_(Y,192).
+locationlocatedwithinlocation_(X,192) :- locationlocatedwithinlocation(192,X).
+agentcontributedtocreativework(X,Y) :- agentcontributedtocreativework(Y,X).
+teamplaysinleague(X,105) :- teamplaysinleague_inv(105,X).
+teamplaysinleague_inv(105,Y) :- teamplaysinleague(Y,105).
+persondiedincountry(X,116) :- persondiedincountry_inv(116,X).
+persondiedincountry_inv(116,Y) :- persondiedincountry(Y,116).
+agentcontrols(X,Y) :- agentcontrols_inv(Y,X).
+subpartoforganization(X,Y) :- subpartoforganization_inv(Y,X).
+organizationhiredperson(X,Y) :- organizationhiredperson_inv(Y,X).
+atdate(X,372) :- atdate_inv(372,X).
+atdate_inv(372,Y) :- atdate(Y,372).
+subpartoforganization(X,791) :- subpartoforganization_inv(791,X).
+subpartoforganization_inv(791,Y) :- subpartoforganization(Y,791).
+drughassideeffect(X,213) :- drughassideeffect_inv(213,X).
+drughassideeffect_inv(213,Y) :- drughassideeffect(Y,213).
+touristattractionsuchastourist(X,472) :- touristattractionsuchastourist1(472,X).
+touristattractionsuchastourist1(472,Y) :- touristattractionsuchastourist(Y,472).
+athleteplaysforteam_inv(X,Y) :- athleteplaysforteam(Y,X).
+agentcollaborateswithagent_inv(X,Y) :- agentcollaborateswithagent(Y,X).
+athleteflyouttosportsteamposit(X,754) :- athleteflyouttosportsteamposit1(754,X).
+athleteflyouttosportsteamposit1(754,Y) :- athleteflyouttosportsteamposit(Y,754).
+athleteplaysforteam(X,Y) :- athleteplaysforteam_inv(Y,X).
+itemfoundinroom(X,Y) :- itemfoundinroom_inv(Y,X).
+atdate(X,272) :- atdate_inv(272,X).
+atdate_inv(272,Y) :- atdate(Y,272).
+agentactsinlocation(X,Y) :- agentactsinlocation_inv(Y,X).
+cityliesonriver_inv(X,Y) :- cityliesonriver(Y,X).
+furniturefoundinroom(147,Y) :- furniturefoundinroom_inv(Y,147).
+furniturefoundinroom_inv(X,147) :- furniturefoundinroom(147,X).
+agentcontrols_inv(X,Y) :- agentcontrols(Y,X).
+atdate(X,596) :- atdate_inv(596,X).
+atdate_inv(596,Y) :- atdate(Y,596).
+athleteplaysinleague(X,1001) :- athleteplaysinleague_inv(1001,X).
+organizationterminatedperson(X,Y) :- organizationterminatedperson_i(Y,X).
+athleteplayssport(X,Y) :- athleteplayssport_inv(Y,X).
+itemfoundinroom_inv(X,Y) :- itemfoundinroom(Y,X).
+hasofficeincity(1,Y) :- hasofficeincity_inv(Y,1).
+hasofficeincity_inv(X,1) :- hasofficeincity(1,X).
+itemfoundinroom(693,Y) :- itemfoundinroom_inv(Y,693).
+itemfoundinroom_inv(X,693) :- itemfoundinroom(693,X).
+personleadsorganization_inv(X,Y) :- personleadsorganization(Y,X).
+hasofficeincity_inv(X,Y) :- hasofficeincity(Y,X).
+animalistypeofanimal(X,Y) :- animalistypeofanimal_inv(Y,X).
+organizationheadquarteredincit(X,Y) :- organizationheadquarteredincit1(Y,X).
+athletehomestadium(X,Y) :- athleteplaysforteam_inv(A,X), teamhomestadium_inv(Y,A).
+academicprogramatuniversity(X,439) :- academicprogramatuniversity_in(439,X).
+academicprogramatuniversity_in(439,Y) :- academicprogramatuniversity(Y,439).
+athleteflyouttosportsteamposit(X,Y) :- athleteflyouttosportsteamposit1(Y,X).

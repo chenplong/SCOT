@@ -1,0 +1,2 @@
+tc(X, Y) :- edge(X, Y).
+tc(X, Z) :- tc(X, Y), edge(Y, Z).
