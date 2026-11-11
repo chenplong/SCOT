@@ -1,0 +1,284 @@
+% Detailed proofs retained separately from the submission manuscript.
+% Deliberately not input by main.tex; the main text contains proof sketches.
+% Keep this file for the full technical version only.
+\appendices
+\section{Proofs of Formal Results}
+\label{app:proofs}
+We use $\Sig\models\gamma$ in its standard rule-consequence sense:
+every model of $\Sig$ satisfies every ground instance of $\gamma$.
+
+\begin{proof}[Proof of Lemma~\ref{lem:closurepreservation}]
+Consider one Phase~1 deletion step. Let $G'\subseteq G$ be the current
+graph and $\gamma$ the non-recursive rule used in this step.
+The subgraph deleted in this step is $\Gdel=G'\cap\tau_{\{\gamma\},G'}$. Every fact in $\Gdel$
+has the head predicate of $\gamma$, which occurs in no body atom of
+$\gamma$. Consequently, for each $d\in \Gdel$, any body match in $G'$
+witnessing $d$ remains a body match in $G'\setminus \Gdel$. Thus
+$\Gdel\subseteq\Delta_{G'\setminus \Gdel,\Sig}$ and
+$G'\subseteq\Delta_{G'\setminus \Gdel,\Sig}$. Since $G'\setminus \Gdel\subseteq G'$,
+monotonicity and idempotence of least-fixpoint closure imply
+\[
+\Delta_{G'\setminus \Gdel,\Sig}=\Delta_{G',\Sig}.
+\]
+Applying this argument to every Phase~1 deletion proves that its
+output $G'$ is a subset of $G$ and has closure $\Delta_{G,\Sig}$.
+The argument does not depend on the particular SCC or rule order.
+
+For a Phase~2 round, let $G'$ be its input graph and let
+$G'_i=\bigcup_{j=1}^{i}\Gblock^{(j)}$ be the subgraph formed by its first $i$ blocks,
+with $G'_0=\emptyset$.
+Denote the retained set and its closure after block $i$ by $\Gkeep^{(i)}$
+and $\Gcl^{(i)}=\Delta_{\Gkeep^{(i)},\Sig}$, with $\Gkeep^{(0)}=\Gcl^{(0)}=\emptyset$.
+The initial closure is empty because PD rules have nonempty bodies.
+We claim, by induction on $i$, that
+\[
+\Gkeep^{(i)}\subseteq G'_i\subseteq \Gcl^{(i)}.
+\]
+It holds for $i=0$. At block $i$, the update
+$\Gkeep^{(i)}=\Gkeep^{(i-1)}\cup(\Gblock^{(i)}\setminus \Gcl^{(i-1)})$ retains only input facts,
+so $\Gkeep^{(i)}\subseteq G'_i$. Every fact of $G'_{i-1}$ lies in
+$\Gcl^{(i-1)}\subseteq \Gcl^{(i)}$. A fact of $\Gblock^{(i)}$ either already lies in
+$\Gcl^{(i-1)}$ or is added to $\Gkeep^{(i)}\subseteq \Gcl^{(i)}$. Hence
+$G'_i\subseteq \Gcl^{(i)}$, proving the induction step.
+At the last block, the partition gives $G'_{N_b}=G'$, so
+$\Gkeep^{(N_b)}\subseteq G'\subseteq\Delta_{\Gkeep^{(N_b)},\Sig}$.
+Monotonicity and idempotence yield
+$\Delta_{G',\Sig}=\Delta_{\Gkeep^{(N_b)},\Sig}$. Each round therefore preserves its
+input closure while retaining a subset of its input. Induction over
+the $T$ rounds, following Phase~1, proves
+$\Gc\subseteq G$ and $\Delta_{\Gc,\Sig}=\Delta_{G,\Sig}$.
+All loops terminate because the graphs and rule set are finite and
+the function-free closure reaches a finite fixpoint.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:cot}]
+We first justify the derivation binding returned by
+\algref{alg:derive}. Define $G^{(0)}=\Gc$ and
+$G^{(i)}=G^{(i-1)}\cup\tau_{\Sig,G^{(i-1)}}$ for $i\geq1$.
+At the start of iteration $i$, the algorithm has $\Gknown=G^{(i-1)}$
+and, for $i>1$, $\Gfront=G^{(i-1)}\setminus G^{(i-2)}$;
+for $i=1$, $\Gfront=G^{(0)}$. Every head admitted by the algorithm
+belongs to $G^{(i)}\setminus G^{(i-1)}$, because all of its body facts
+belong to $G^{(i-1)}$ and previously known heads are excluded.
+Conversely, let $d\in G^{(i)}\setminus G^{(i-1)}$ and choose a rule
+instance deriving it from $G^{(i-1)}$. At least one body occurrence
+belongs to $\Gfront$. Otherwise all its body facts would
+already belong to $G^{(i-2)}$, and $d$ would be in $G^{(i-1)}$.
+For $i=1$, every body occurrence belongs to the initial $\Gfront$.
+The algorithm examines this position and therefore admits $d$.
+It records one witness for each newly admitted head, even if several
+instances derive the same head. Induction proves that the returned
+$G^{*}$ is $\Delta_{\Gc,\Sig}$ and that every
+$d\in G^{*}\setminus\Gc$ has a recorded witness whose body facts
+have strictly smaller derivation levels. Finiteness of the active
+domain makes this process terminate.
+
+Now consider $\FunctionName{UnfoldRule}$ for an omitted fact $d$.
+Maintain the following invariant for its current rule $\gamma^{(j)}$ and
+ground witness $\sigma_{\mathrm w}$:
+\[
+\Sig\models\gamma^{(j)},\qquad
+\sigma_{\mathrm w}(H_{\gamma^{(j)}})=d,\qquad
+\sigma_{\mathrm w}(B_{\gamma^{(j)}})\subseteq G^{*}.
+\]
+It holds initially for the freshly renamed input rule recorded for
+$d$. If a body occurrence $\beta$ has witness
+$e=\sigma_{\mathrm w}(\beta)\notin\Gc$, the binding $\Der[e]$
+provides a freshly renamed rule $\gamma'$ and ground witness
+$\sigma'$ with $\sigma'(H_{\gamma'})=e$.
+The two clauses have disjoint variables. Their ground witnesses
+agree on the resolved atom, so their union unifies
+$\beta$ and $H_{\gamma'}$. The relevant MGU $\mu$ therefore
+factors this ground unifier on the resolved atoms. Extending the
+factorization by the original ground assignments on other clause
+variables gives the ground substitution $\lambda$ used in the
+algorithm.
+Applying $\mu$ to the whole rule and replacing just the selected
+body occurrence by $\mu(B_{\gamma'})$ preserves the witnessed
+head and assigns the child's recorded body facts to the inserted
+occurrences. Definite-clause resolution also preserves
+$\Sig\models\gamma^{(j+1)}$. Range restriction is preserved: a head variable
+whose only body occurrence was replaced remains represented in the
+range-restricted child's body. Thus the invariant continues to hold.
+
+Each expanded occurrence has a derivation level greater than the
+levels of its inserted supports. Expansion therefore forms a
+finitely branching tree of depth at most $\ell$, the number of
+productive derivation levels. It terminates with every ground body
+fact in $\Gc$. Keeping occurrences distinct until the end ensures
+that only the chosen occurrence is expanded. Removing duplicate
+body atoms on return changes neither the clause's meaning nor its
+ground witness. Hence the returned path rule $\gamma_d$ is
+entailed by $\Sig$ and has a ground instance with head $d$ and
+body contained in $\Gc$.
+
+Every initialized identity rule is a tautology and covers its
+retained facts in one step; pruning retains these identity rules.
+During the loop in
+\algref{alg:gencot}, each omitted fact is either already
+covered by a current rule or receives such a path rule. Therefore,
+before pruning, every fact in $G^{*}$ is covered by an instance
+over $\Gc$. Deduplication preserves this property.
+Suppose a remaining rule $\gamma'$ subsumes a rule $\gamma$
+being removed, witnessed by a substitution $\theta$ with
+$\theta(H_{\gamma'})=H_\gamma$ and
+$\theta(B_{\gamma'})\subseteq B_\gamma$.
+For any ground witness $\sigma$ of $\gamma$ over $\Gc$,
+$\sigma\circ\theta$ witnesses the same head through $\gamma'$,
+since
+\[
+(\sigma\circ\theta)(B_{\gamma'})
+ \subseteq\sigma(B_\gamma)\subseteq\Gc.
+\]
+Each pruning step therefore preserves coverage. All surviving
+rules are entailed by $\Sig$, giving
+$\Gc\cup\tau_{\Sigcot,\Gc}\subseteq\Delta_{\Gc,\Sig}$;
+coverage gives the reverse inclusion. Thus $\Sigcot$ satisfies all
+conditions of Definition~\ref{def:cot}. At most one finite path
+rule is generated per omitted closure fact, in addition to finitely
+many identities, so $\Sigcot$ is finite. None of these operations
+uses the query.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:queryeq}]
+Lemma~\ref{lem:closurepreservation} gives
+$G^{*}=\Delta_{\Gc,\Sig}$, and Theorem~\ref{thm:cot} gives
+$G^{*}=\Gc\cup\tau_{\Sigcot,\Gc}$.
+The initialized identities cover every fact of $\Gc$, and the
+pruning argument in the preceding proof preserves that coverage.
+Consequently, the stronger atomic equality
+\[
+\tau_{\Sigcot,\Gc}=G^{*}
+\]
+holds. This equality is useful because atom-wise rewriting uses
+rule candidates, rather than a separate stored-fact branch.
+
+Fix a query atom $\alpha_k$ with distinct variables $\vect{Z}_k$.
+Let $R_k^{*}$ be its match relation over $G^{*}$, with columns
+$\vect{Z}_k$. For any candidate rule, a body match over $\Gc$
+produces an instance of its head in $G^{*}$ by soundness. Unifying
+that head with $\alpha_k$ therefore produces a tuple in $R_k^{*}$;
+the output mapping preserves constants and repeated variables.
+Conversely, take any tuple in $R_k^{*}$ and its ground match of
+$\alpha_k$. By the atomic equality, a ground instance of some
+$\gamma\in\Sigcot$ has the same head fact and a body match in $\Gc$.
+Rename $\gamma$ apart from the query. The two head matches give
+a ground unifier of $H_\gamma$ and $\alpha_k$.
+Relevant-MGU factorization yields a match of the corresponding
+candidate body, extending the ground substitution to body-only
+rule variables using the original rule-instance witness. Its
+output tuple is precisely the selected tuple
+of $R_k^{*}$. Hence the union of candidate branches equals $R_k^{*}$.
+
+The query frontier $\xi_k$ contains every variable of $\alpha_k$
+that either occurs in another query atom or is an answer variable.
+All other variables of $\alpha_k$ can be existentially quantified
+within this group. Therefore its compiled relation is
+$R_k=\pi_{\xi_k}(R_k^{*})$. By ordinary CQ semantics, the answer relation
+for $Q$ over $G^{*}$ is
+\[
+\pi_{\vect{X}}\bigl(R_1\bowtie\cdots\bowtie R_m\bigr).
+\]
+This also holds for disconnected atoms, constants, and identified
+variables. With an empty frontier, $R_k$ is either the unit
+zero-column tuple or the empty relation, so it contributes exactly
+the required existence condition. The same convention handles
+Boolean queries. This proves P00.
+
+For \QFSE{}, fix any ordering $\beta_1,\ldots,\beta_s$ of a
+candidate body's atom occurrences. The retained variable set
+$\xi_{k,i}^{(j)}$ in~\S\ref{sec:sqlcomposition} contains exactly the variables
+among the first $j$ atoms needed by the output or a later atom.
+The stage invariant is
+\[
+R_{k,i}^{(j)}
+=\pi_{\xi_{k,i}^{(j)}}
+ (R_{\beta_1}\bowtie\cdots\bowtie R_{\beta_j}),
+\]
+with
+$R_{k,i}^{(0)}=\{()\}$. A variable projected out at stage $j-1$
+occurs neither in the branch's required output nor in any
+remaining atom; hence it cannot influence a later join.
+Joining $R_{k,i}^{(j-1)}$ with $R_{\beta_j}$ and projecting onto
+$\xi_{k,i}^{(j)}$
+establishes the invariant by induction. If every variable in
+$\xi_{k,i}^{(j)}$ is already a column of $R_{k,i}^{(j-1)}$, the current atom
+introduces no required output variable. Under set semantics,
+\[
+\pi_{\xi_{k,i}^{(j)}}(R_{k,i}^{(j-1)}\bowtie R_{\beta_j})
+=\pi_{\xi_{k,i}^{(j)}}(R_{k,i}^{(j-1)}\ltimes R_{\beta_j}),
+\]
+so the permitted semi-join implements the same stage. Constant
+and repeated-variable constraints belong to each atom's match
+relation. At the final stage, the retained variables and any
+constant output terms restore exactly the original branch's
+$\xi_k$ columns. Thus \QFSE{} preserves every group, regardless of
+the chosen body-atom order.
+
+For \UFA{}, each source group with $\xi_k=\{x\}$ is a unary relation
+on $x$. Their natural join is exactly
+$R_x^{\mathrm u}=\bigcap_{k\in \mathcal I_x}\pi_x(R_k)$.
+For a multi-frontier group $R_j$ containing $x$, replacing it by
+$R_j\ltimes_x R_x^{\mathrm u}$ pushes the same membership constraint into
+that group. If at least one such group remains, its $x$ column
+keeps the constraint in the top-level join, so the original
+singleton-frontier sources can be removed. Applying the filter
+to every eligible group is idempotent under set semantics.
+If no multi-frontier group contains $x$, retaining $R_x^{\mathrm u}$ when
+$x$ is an answer variable preserves its possible output values;
+when $x$ is existential, an $\mathrm{EXISTS}(R_x^{\mathrm u})$ guard
+preserves its required nonemptiness. Every zero-frontier group
+likewise remains an existence guard. These rules also cover an
+empty top-level join.
+
+In P11, the $R_x^{\mathrm u}$ membership test is applied to each candidate
+using its mapped output value, after that value is bound or
+immediately if it is a constant. A frontier variable needed by
+the test is included in the fixed required output of \QFSE{} and
+cannot be projected away before or after the test. Thus the
+\QFSE{} and \UFA{} equivalences compose.
+\algref{alg:compile} emits the unions, joins, projections,
+semi-joins, and existence guards just proved equivalent, with
+distinct outputs under the paper's set semantics. Its SQL
+interpretation uses a faithful null-free encoding of $\Gc$ and
+equality joins. For completed executions, each of P00, P01, P10,
+and P11 therefore returns exactly the answers to $Q$ over $G^{*}$.
+Selecting one of these equivalent modes with the cost-sensitive
+policy tree cannot change the answer set. Taking a finite union
+of CQs with a common answer schema also preserves the equality
+branch by branch.
+\end{proof}
+
+\subsection{Auxiliary Size and Cost Bounds}
+For completeness, the size bound in~\eqref{eq:cot-size-bound}
+follows from the same decreasing-level argument. Each productive
+iteration of \algref{alg:derive} creates at least one of
+the $M=|G^{*}\setminus\Gc|$ omitted facts, so $\ell\leq M$.
+A path rule's unfolding tree has branching at most
+$b=\max(\{1\}\cup\{|B_\gamma|:\gamma\in\Sig\})$
+and depth at most $\ell$. It has at most $b^{\ell}$ leaf
+occurrences, hence at most that many body atoms after
+deduplication. There are at most $M$ generated path rules, each
+with one head, and $P$ identities, each with one head and one
+body atom. Thus
+\[
+L_{\Sigcot}\leq 2P+M(1+b^{\ell}).
+\]
+Deduplication and subsumption removal can only decrease this
+count. The estimate establishes finiteness; it is exponential
+in $\ell$ when $b>1$.
+
+The grouped candidate representation stores one group record
+per query atom, one record per candidate, and each candidate
+body once. With unary/binary predicates and interned symbols,
+the output mapping has constant size per candidate. For $m$
+atoms, $n_k$ candidates in group $k$, and total candidate-body
+length $L$, this gives $O(m+\sum_k n_k+L)$ words, as stated in
+\S\ref{sec:correctness}. The bound concerns the grouped
+representation, not emitted SQL or database intermediate results.
+Compiling four modes, extracting their features, traversing a
+height-$h$ policy tree, and executing one selected plan gives
+\eqref{eq:online-cost}. Counting the retained facts, the
+head/body atoms of $\Sigcot$, and the policy model gives
+\eqref{eq:stored-space} under the stated bounded-arity and
+interned-symbol convention.

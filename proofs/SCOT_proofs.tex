@@ -1,0 +1,47 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage[protrusion=true,expansion=true]{microtype}
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+
+% Shared notation used by the unmodified proof source.
+\newcommand{\ConceptName}[1]{\textnormal{\textsc{#1}}}
+\DeclareRobustCommand{\FunctionName}[1]{%
+  \ifmmode\mathop{\text{\normalfont\textsc{#1}}}\nolimits%
+  \else\textnormal{\textsc{#1}}\fi}
+\newcommand{\COT}{\ConceptName{COT}}
+\newcommand{\QFSE}{\ConceptName{QFSE}}
+\newcommand{\UFA}{\ConceptName{UFA}}
+\newcommand{\vect}[1]{\vec{#1}}
+\newcommand{\algref}[1]{Alg.~\ref{#1}}
+\newcommand{\Gc}{G^{\dagger}}
+\newcommand{\Gdel}{G_{\mathrm{del}}}
+\newcommand{\Gblock}{G_{\mathrm{blk}}}
+\newcommand{\Gkeep}{G_{\mathrm{keep}}}
+\newcommand{\Gcl}{G_{\mathrm{cl}}}
+\newcommand{\Gknown}{G_{\mathrm{known}}}
+\newcommand{\Gfront}{G_{\mathrm{new}}}
+\newcommand{\Gnext}{G_{\mathrm{next}}}
+\newcommand{\Sig}{\Sigma}
+\newcommand{\Sigcot}{\Sig^{\mathrm{cot}}}
+\newcommand{\Der}{\mathcal{D}}
+
+% Resolve references without requiring a copy of the manuscript or its PDF.
+% No hyperlinks are created for targets outside this document.
+\input{paper_references}
+
+\begin{document}
+\title{SCOT: Proofs of Formal Results}
+\author{}
+\maketitle
+\pagestyle{plain}
+\thispagestyle{plain}
+
+\noindent\textit{Companion to SCOT: Queryable Semantic Compression via
+Complete One-Hop Transformed Rule Set.}
+Numbered statements, algorithms, sections, and equations referenced below
+use the numbering of the manuscript dated November 12, 2026.
+
+\input{11_appendix_proofs}
+\end{document}

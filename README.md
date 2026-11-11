@@ -12,6 +12,13 @@ datasets/   Rules, queries, selector inputs/model, and a small example
 README.md
 ```
 
+## Formal proofs
+
+The detailed mathematical proofs are available as a
+[PDF](proofs/SCOT_proofs.pdf), with the
+[original TeX source](proofs/11_appendix_proofs.tex) and
+[standalone compilation instructions](proofs/README.md).
+
 ## Install
 
 Use Python 3.9-3.12:
