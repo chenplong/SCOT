@@ -1,11 +1,220 @@
-% Detailed proofs retained separately from the submission manuscript.
-% Deliberately not input by main.tex; the main text contains proof sketches.
-% Keep this file for the full technical version only.
-\appendices
-\section{Proofs of Formal Results}
-\label{app:proofs}
-We use $\Sig\models\gamma$ in its standard rule-consequence sense:
+% Compile this file directly. It has no dependency on main.tex or macro.tex.
+\documentclass[conference]{IEEEtran}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{cite}
+\usepackage{balance}
+\usepackage[protrusion=true,expansion=true]{microtype}
+\usepackage[hidelinks]{hyperref}
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+\newcommand{\vect}[1]{\vec{#1}}
+\newcommand{\Gc}{G^{\dagger}}
+\newcommand{\Gdel}{G_{\mathrm{del}}}
+\newcommand{\Gblock}{G_{\mathrm{blk}}}
+\newcommand{\Gkeep}{G_{\mathrm{keep}}}
+\newcommand{\Gcl}{G_{\mathrm{cl}}}
+\newcommand{\Gknown}{G_{\mathrm{known}}}
+\newcommand{\Gfront}{G_{\mathrm{new}}}
+\newcommand{\Sig}{\Sigma}
+\newcommand{\Sigcot}{\Sig^{\mathrm{cot}}}
+\newcommand{\Der}{\mathcal{D}}
+\newcommand{\COT}{\textsc{COT}}
+\newcommand{\QFSE}{\textsc{QFSE}}
+\newcommand{\UFA}{\textsc{UFA}}
+\newcommand{\FunctionName}[1]{\textsc{#1}}
+\newcommand{\algref}[1]{Section~\ref{#1}}
+
+\begin{document}
+\title{SCOT: Complete Proofs and Supporting Definitions}
+\author{Polong Chen, Jianfeng Du, Hai Wan, Weilin Luo, Yanan Liu,
+Junhua Ma, and Rongzhen Ye}
+\maketitle
+
+\begin{abstract}
+This self-contained technical document specifies the graph compression,
+one-hop rule construction, and four conjunctive-query evaluation modes of
+SCOT. It gives the definitions, notation, procedure descriptions, formal
+statements, and complete proofs needed to verify closure preservation,
+one-hop completeness, and exact query answering independently.
+\end{abstract}
+
+\section{Setting and Notation}
+\label{sec:setting}
+A term is a variable or a constant. A ground atom contains no variables.
+A graph $G$ is a finite set of ground unary or binary atoms, also called
+facts. All facts, relations, and query answers have set semantics. A
+plain Datalog (PD) rule is a function-free, universally quantified,
+range-restricted definite clause
+$\gamma:H_\gamma\leftarrow\beta_1\wedge\cdots\wedge\beta_s$,
+where $s\geq1$ and each head variable appears in its body. Constants,
+repeated variables, and recursion are allowed. The body set
+$B_\gamma=\{\beta_1,\ldots,\beta_s\}$ identifies duplicate atoms, whereas
+the list $L_\gamma$ retains indexed occurrences during unfolding. The
+finite input rule set is $\Sig$.
+
+A substitution maps variables to terms and extends to atoms, rule bodies,
+and rules. A ground substitution assigns constants to all variables of
+the relevant rule. For a rule set $\Gamma$ and graph $F$, define
+\begin{equation}
+\label{eq:one-step}
+\tau_{\Gamma,F}=\{\sigma(H_\gamma):\gamma\in\Gamma,
+\ \sigma(B_\gamma)\subseteq F,\ \sigma\text{ ground}\}.
+\end{equation}
+Starting with $F^{(0)}=F$, repeatedly set
+$F^{(i+1)}=F^{(i)}\cup\tau_{\Sig,F^{(i)}}$.
+The finite least fixpoint is $\Delta_{F,\Sig}$. Finiteness follows from
+the finite active domain and absence of function symbols. Closure is
+monotone and idempotent. The notation $\Sig\models\gamma$ means that
 every model of $\Sig$ satisfies every ground instance of $\gamma$.
+A graph is rule-closed if $G=\Delta_{G,\Sig}$.
+
+Two atoms unify when a substitution makes them identical. A most general
+unifier (MGU) $\mu$ factors every unifier $\rho$ on those atoms as
+$\rho=\theta\circ\mu$. We use a relevant MGU that fixes variables
+outside the two atoms and rename independent rule copies apart. A rule
+$\gamma'$ subsumes $\gamma$ if a substitution $\theta$ satisfies
+$\theta(H_{\gamma'})=H_\gamma$ and
+$\theta(B_{\gamma'})\subseteq B_\gamma$. An identity rule for predicate
+$p$ is $p(\vect{Z})\leftarrow p(\vect{Z})$ with distinct variables of
+the appropriate arity.
+
+\section{Offline Procedures and Recovery Contract}
+\label{sec:procedures}
+The procedure descriptions here fix all behavior needed by the proofs.
+Rule ordering and witness choices may vary without changing the results.
+
+\subsection{Semantic compression}
+\label{alg:compress}
+Given finite $G,\Sig$ and integers $T,N_b\geq1$, start with $G'=G$.
+In Phase~1, process each rule $\gamma$ whose head predicate is absent
+from its own body once, in any fixed order. On its turn, delete exactly
+$\Gdel=G'\cap\tau_{\{\gamma\},G'}$ from $G'$. The implementation may
+order strongly connected components and rule support counts, but the
+proof needs only this sequential deletion. In each of $T$ Phase~2
+rounds, partition the current $G'$ into disjoint blocks
+$\Gblock^{(1)},\ldots,\Gblock^{(N_b)}$ whose union is $G'$.
+Initialize $\Gkeep=\Gcl=\emptyset$ and for $i=1,\ldots,N_b$ update
+\begin{equation}
+\label{eq:block-update}
+\Gkeep\leftarrow\Gkeep\cup(\Gblock^{(i)}\setminus\Gcl),\qquad
+\Gcl\leftarrow\Delta_{\Gkeep,\Sig}.
+\end{equation}
+Replace $G'$ by $\Gkeep$ after each round and return the final graph as
+$\Gc$. There are no empty-body rules, so
+$\Delta_{\emptyset,\Sig}=\emptyset$.
+
+\subsection{Record derivations}
+\label{alg:derive}
+From $\Gc$, compute successive fixpoint levels
+$G^{(0)}=\Gc$ and
+$G^{(i)}=G^{(i-1)}\cup\tau_{\Sig,G^{(i-1)}}$.
+At iteration $i$, let $\Gknown=G^{(i-1)}$ and let $\Gfront=\Gc$ for
+$i=1$, or $G^{(i-1)}\setminus G^{(i-2)}$ otherwise. Enumerate rule
+instances whose body lies in $\Gknown$ and whose body has at least
+one occurrence in $\Gfront$. For every newly derived head $d$, record
+one pair $\Der[d]=(\gamma,\sigma)$ with
+$\sigma(H_\gamma)=d$ and $\sigma(B_\gamma)\subseteq\Gknown$.
+Ignore additional witnesses for the same head. The final $G^{(i)}$
+is denoted $G^{*}=\Delta_{\Gc,\Sig}$, and $\Der$ is undefined on
+$\Gc$. The least iteration in which $d$ appears is its derivation
+level. Let $\ell$ be the largest productive level.
+
+\begin{definition}[Complete one-hop transformed rule set]
+\label{def:cot}
+Finite PD rules $\Sigcot$ form a \COT{} rule set for $\Sig$ relative
+to $\Gc$ if (i) $\Sig\models\gamma$ for every
+$\gamma\in\Sigcot$, (ii)
+$\Delta_{\Gc,\Sig}=\Gc\cup\tau_{\Sigcot,\Gc}$, and
+(iii) $\Sigcot$ contains an identity rule for each predicate in
+$\Gc$ or in a head of $\Sigcot$.
+\end{definition}
+
+\subsection{Generate one-hop rules}
+\label{alg:gencot}
+Initialize $\Sigcot$ with identity rules for predicates occurring in
+$G^{*}$ or $\Sig$. Process each $d\in G^{*}\setminus\Gc$. If an
+existing rule instance over $\Gc$ already has head $d$, continue.
+Otherwise start from a freshly renamed copy of $\Der[d]$ and its
+ground witness. While some indexed body occurrence has a witnessed
+fact outside $\Gc$, take that fact's recorded derivation, rename it
+apart, unify its head with the selected occurrence, and replace only
+that occurrence by its body. Apply the MGU to the entire resulting
+rule and factor the combined ground witnesses through the MGU.
+After every witnessed body fact lies in $\Gc$, identify duplicate
+body atoms and add the resulting rule. Finally deduplicate rules and
+repeatedly remove a non-identity rule subsumed by a remaining rule.
+This procedure is $\FunctionName{GenerateCOT}$, and its unfolding
+subroutine is $\FunctionName{UnfoldRule}$.
+
+\section{Query Evaluation Definitions}
+\label{sec:sqlcomposition}
+A conjunctive query (CQ) is
+$Q(\vect{X})\leftarrow\alpha_1\wedge\cdots\wedge\alpha_m$, where
+$m\geq1$, $\vect{X}$ is an ordered tuple of answer variables in the
+body, and other variables are existential. It is Boolean when
+$\vect{X}$ is empty. A finite union of CQs (UCQ) has disjuncts of
+the same answer arity. Answers are ground matches, projected onto
+$\vect{X}$. For atom $\alpha_k$, let $\vect{Z}_k$ list its distinct
+variables. A candidate branch is obtained by freshly renaming a
+rule $\gamma\in\Sigcot$, unifying $H_\gamma$ with $\alpha_k$, and
+using the unified body as a CQ with output mapping on $\vect{Z}_k$.
+The mapping enforces constants and identified variables. Let
+$R_k^{*}$ be all matches of $\alpha_k$ over $G^{*}$.
+
+The frontier $\xi_k$ contains variables of $\alpha_k$ that occur in
+another query atom or in $\vect{X}$. The union of candidate branch
+outputs, projected to the ordered frontier, is $R_k$. Projection
+$\pi$, natural join $\bowtie$, and semi-join $\ltimes$ have ordinary
+set-relational meanings. Joins on no shared columns are Cartesian
+products. A zero-column relation is either $\{()\}$ or $\emptyset$.
+The base factorized plan P00 computes
+\begin{equation}
+\label{eq:factorized}
+\pi_{\vect{X}}(R_1\bowtie\cdots\bowtie R_m).
+\end{equation}
+Candidate-free groups have an empty relation. An empty projection is
+an existence test.
+
+\QFSE{} (query-frontier-sensitive execution) is the P10 switch.
+Within each candidate, order the body atom occurrences as
+$\beta_1,\ldots,\beta_s$. At stage $j$, retain the variables among
+the first $j$ atoms that are required by the branch's mapped output
+or by a later body atom. Call this set $\xi_{k,i}^{(j)}$, where $i$
+identifies the candidate. Starting with $R_{k,i}^{(0)}=\{()\}$,
+join each atom's match relation $R_{\beta_j}$ and project to this
+set. A semi-join may replace a join if no new required column is
+introduced. Required output bindings remain fixed across all stages.
+
+\UFA{} (unary frontier absorption) is the P01 switch. For a variable
+$x$ with singleton-frontier source groups, set
+\begin{equation}
+\label{eq:unary}
+\mathcal I_x=\{k:\xi_k=\{x\}\},\qquad
+R_x^{\mathrm u}=\bigcap_{k\in\mathcal I_x}\pi_x(R_k).
+\end{equation}
+Push this unary membership test into every group with a frontier of
+size greater than one that contains $x$, then remove the source
+groups from the top-level join. If no such group exists, retain the
+unary relation when $x$ is an answer variable and retain its
+nonemptiness as an existence guard otherwise. Zero-frontier groups
+always remain existence guards. P11 applies both switches, placing
+unary tests on each candidate's mapped output before projection.
+\FunctionName{Compile} emits the corresponding unions, joins,
+semi-joins, projections, and guards as distinct, null-free SQL over
+$\Gc$. An offline policy tree chooses one of P00, P01, P10, and P11
+for execution.
+
+\section{Complete Proofs}
+\label{sec:proofs}
+
+\begin{lemma}[Redundancy removal preserves the least fixpoint]
+\label{lem:closurepreservation}
+For finite $G,\Sig$ and $T,N_b\geq1$, semantic compression returns
+$\Gc\subseteq G$ with $\Delta_{\Gc,\Sig}=\Delta_{G,\Sig}$.
+\end{lemma}
 
 \begin{proof}[Proof of Lemma~\ref{lem:closurepreservation}]
 Consider one Phase~1 deletion step. Let $G'\subseteq G$ be the current
@@ -51,7 +260,15 @@ All loops terminate because the graphs and rule set are finite and
 the function-free closure reaches a finite fixpoint.
 \end{proof}
 
-\begin{proof}[Proof of Theorem~\ref{thm:cot}]
+\begin{theorem}[Correctness of one-hop rule construction]
+\label{thm:cot}
+Given finite $G,\Sig$, let semantic compression return $\Gc$ and
+derivation recording return $G^{*},\Der$. The rule-generation
+procedure constructs a finite \COT{} rule set $\Sigcot$ independently
+of any subsequently submitted query.
+\end{theorem}
+
+\begin{proof}
 We first justify the derivation binding returned by
 \algref{alg:derive}. Define $G^{(0)}=\Gc$ and
 $G^{(i)}=G^{(i-1)}\cup\tau_{\Sig,G^{(i-1)}}$ for $i\geq1$.
@@ -140,7 +357,16 @@ many identities, so $\Sigcot$ is finite. None of these operations
 uses the query.
 \end{proof}
 
-\begin{proof}[Proof of Theorem~\ref{thm:queryeq}]
+\begin{theorem}[Exact single-step query answering]
+\label{thm:queryeq}
+Under the preceding assumptions, for every CQ $Q$, each of P00, P01,
+P10, and P11 evaluated over $\Gc$ returns exactly the answers to $Q$
+over $G^{*}$. Policy-tree selection preserves this equality. If
+$G$ is rule-closed, these are the answers over the original $G$.
+The statement also holds for finite UCQs by disjunct-wise union.
+\end{theorem}
+
+\begin{proof}
 Lemma~\ref{lem:closurepreservation} gives
 $G^{*}=\Delta_{\Gc,\Sig}$, and Theorem~\ref{thm:cot} gives
 $G^{*}=\Gc\cup\tau_{\Sigcot,\Gc}$.
@@ -187,7 +413,7 @@ Boolean queries. This proves P00.
 
 For \QFSE{}, fix any ordering $\beta_1,\ldots,\beta_s$ of a
 candidate body's atom occurrences. The retained variable set
-$\xi_{k,i}^{(j)}$ in~\S\ref{sec:sqlcomposition} contains exactly the variables
+$\xi_{k,i}^{(j)}$ in Section~\ref{sec:sqlcomposition} contains exactly the variables
 among the first $j$ atoms needed by the output or a later atom.
 The stage invariant is
 \[
@@ -237,9 +463,9 @@ immediately if it is a constant. A frontier variable needed by
 the test is included in the fixed required output of \QFSE{} and
 cannot be projected away before or after the test. Thus the
 \QFSE{} and \UFA{} equivalences compose.
-\algref{alg:compile} emits the unions, joins, projections,
+The compiler of Section~\ref{sec:sqlcomposition} emits the unions, joins, projections,
 semi-joins, and existence guards just proved equivalent, with
-distinct outputs under the paper's set semantics. Its SQL
+distinct outputs under the set semantics defined here. Its SQL
 interpretation uses a faithful null-free encoding of $\Gc$ and
 equality joins. For completed executions, each of P00, P01, P10,
 and P11 therefore returns exactly the answers to $Q$ over $G^{*}$.
@@ -249,21 +475,25 @@ of CQs with a common answer schema also preserves the equality
 branch by branch.
 \end{proof}
 
-\subsection{Auxiliary Size and Cost Bounds}
-For completeness, the size bound in~\eqref{eq:cot-size-bound}
-follows from the same decreasing-level argument. Each productive
-iteration of \algref{alg:derive} creates at least one of
-the $M=|G^{*}\setminus\Gc|$ omitted facts, so $\ell\leq M$.
-A path rule's unfolding tree has branching at most
-$b=\max(\{1\}\cup\{|B_\gamma|:\gamma\in\Sig\})$
-and depth at most $\ell$. It has at most $b^{\ell}$ leaf
+\balance
+\section{Auxiliary Size and Cost Bounds}
+\label{sec:bounds}
+Let $M=|G^{*}\setminus\Gc|$, let $P$ count the initialized identity
+rules, and put $b=\max(\{1\}\cup\{|B_\gamma|:\gamma\in\Sig\})$.
+Let $L_{\Sigcot}$ count head and body atoms in the final rule set.
+The size bound
+\begin{equation}
+\label{eq:cot-size-bound}
+L_{\Sigcot}\leq 2P+M(1+b^{\ell})
+\end{equation}
+follows from decreasing derivation levels. Each productive
+iteration of \algref{alg:derive} creates at least one omitted fact,
+so $\ell\leq M$. A path rule's unfolding tree has branching at
+most $b$ and depth at most $\ell$. It has at most $b^{\ell}$ leaf
 occurrences, hence at most that many body atoms after
 deduplication. There are at most $M$ generated path rules, each
 with one head, and $P$ identities, each with one head and one
-body atom. Thus
-\[
-L_{\Sigcot}\leq 2P+M(1+b^{\ell}).
-\]
+body atom.
 Deduplication and subsumption removal can only decrease this
 count. The estimate establishes finiteness; it is exponential
 in $\ell$ when $b>1$.
@@ -273,12 +503,28 @@ per query atom, one record per candidate, and each candidate
 body once. With unary/binary predicates and interned symbols,
 the output mapping has constant size per candidate. For $m$
 atoms, $n_k$ candidates in group $k$, and total candidate-body
-length $L$, this gives $O(m+\sum_k n_k+L)$ words, as stated in
-\S\ref{sec:correctness}. The bound concerns the grouped
+length $L$, this gives $O(m+\sum_k n_k+L)$ words. The bound concerns the grouped
 representation, not emitted SQL or database intermediate results.
 Compiling four modes, extracting their features, traversing a
 height-$h$ policy tree, and executing one selected plan gives
-\eqref{eq:online-cost}. Counting the retained facts, the
-head/body atoms of $\Sigcot$, and the policy model gives
-\eqref{eq:stored-space} under the stated bounded-arity and
-interned-symbol convention.
+\begin{equation}
+\label{eq:online-cost}
+\begin{aligned}
+C_{\mathrm{online}}(Q)=O\bigl(&4C_{\mathrm{comp}}(Q)
++C_{\mathrm{feat}}(Q)\\
+&+h+C_{\mathrm{query}}(Q)\bigr),
+\end{aligned}
+\end{equation}
+where the three $C$ terms bound one-mode compilation, feature
+extraction, and selected-plan execution, respectively. Counting the
+retained facts, the head and body atoms of $\Sigcot$, and the policy
+model gives
+\begin{equation}
+\label{eq:stored-space}
+S_{\mathrm{stored}}=O(|\Gc|+L_{\Sigcot}+S_{\mathrm{policy}})
+\end{equation}
+words under bounded arity and interned symbols; $S_{\mathrm{policy}}$
+is the policy-tree size. Neither storage nor representation bounds
+include execution intermediates.
+
+\end{document}
